@@ -15,7 +15,7 @@
  * used to pass the state of the DIP switches to the webpage.
  ******************************************************************************/
 
-#include "predef.h"
+#include <predef.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <startnet.h>
@@ -24,17 +24,15 @@
 #include <smarttrap.h>
 #include <constants.h>
 #include <websockets.h>
-#include <tcp.h>
 #include <string.h>
 #include <webclient/json_lexer.h>
-#include <webclient/http_funcs.h>
 #include "SimpleAD.h"
 
 extern "C" {
 void UserMain(void * pd);
 }
 
-const char * AppName="Real-Time DIP Switch State via WebSocket";
+const char * AppName="Real-Time DIP Switch States via WebSocket";
 
 #define REPORT_BUF_SIZE 		512
 #define NUM_SWITCHES			8
