@@ -36,8 +36,7 @@ void UserMain(void * pd);
 
 const char * AppName="Real-Time DIP Switch State via WebSocket";
 
-#define INCOMING_BUF_SIZE 		8192
-#define REPORT_BUF_SIZE 		8192
+#define REPORT_BUF_SIZE 		512
 #define NUM_SWITCHES			8
 #define DIP_STATE_BUF_SIZE		8
 
@@ -46,7 +45,6 @@ char ReportBuffer[REPORT_BUF_SIZE];
 extern http_wshandler *TheWSHandler;
 int ws_fd = -1;
 OS_SEM SockReadySem;
-char IncomingBuffer[INCOMING_BUF_SIZE];
 char dipStates[NUM_SWITCHES][DIP_STATE_BUF_SIZE];
 
 
