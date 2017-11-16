@@ -1,0 +1,211 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+
+var ws;
+var report;
+var dip1, dip2, dip3, dip4, dip5, dip6, dip7, dip8;
+
+function updateCheckBox() {
+    if( dip1 === "Off" )
+    {
+        document.getElementById("cbox1").checked = false; 
+    }
+    else if(dip1 === "On") 
+    {
+        document.getElementById("cbox1").checked = true; 
+    }
+
+    if( dip2 === "Off" )
+    {
+        document.getElementById("cbox2").checked = false; 
+    }
+    else if(dip1 === "On") 
+    {
+        document.getElementById("cbox2").checked = true; 
+    }
+
+    if( dip3 === "Off" )
+    {
+        document.getElementById("cbox3").checked = false; 
+    }
+    else if(dip3 === "On") 
+    {
+        document.getElementById("cbox3").checked = true; 
+    }
+
+    if( dip4 === "Off" )
+    {
+        document.getElementById("cbox4").checked = false; 
+    }
+    else if(dip4 === "On") 
+    {
+        document.getElementById("cbox4").checked = true; 
+    }
+
+    if( dip5 === "Off" )
+    {
+        document.getElementById("cbox5").checked = false; 
+    }
+    else if(dip5 === "On") 
+    {
+        document.getElementById("cbox5").checked = true; 
+    }
+
+    if( dip6 === "Off" )
+    {
+        document.getElementById("cbox6").checked = false; 
+    }
+    else if(dip6 === "On") 
+    {
+        document.getElementById("cbox6").checked = true; 
+    }
+
+    if( dip7 === "Off" )
+    {
+        document.getElementById("cbox7").checked = false; 
+    }
+    else if(dip7 === "On") 
+    {
+        document.getElementById("cbox7").checked = true; 
+    }
+
+    if( dip8 === "Off" )
+    {
+        document.getElementById("cbox8").checked = false; 
+    }
+    else if(dip8 === "On") 
+    {
+        document.getElementById("cbox8").checked = true; 
+    }
+
+}
+
+function MakeDataSocket() {
+    if ("WebSocket" in window)
+    {
+        if ((ws==null) || (ws.readyState==WebSocket.CLOSED)) 
+        {
+            ws = new WebSocket("ws://"+window.location.hostname+"/INDEX");
+            ws.onopen = function()
+            {
+            };
+            ws.onmessage = function(evt) {
+                var rxMsg = evt.data;
+                report = JSON.parse(rxMsg);
+                
+                dip1 = report.dipSwitches.dip1;
+                dip2 = report.dipSwitches.dip2;
+                dip3 = report.dipSwitches.dip3;
+                dip4 = report.dipSwitches.dip4;
+                dip5 = report.dipSwitches.dip5;
+                dip6 = report.dipSwitches.dip6;
+                dip7 = report.dipSwitches.dip7;
+                dip8 = report.dipSwitches.dip8;
+                    
+                updateCheckBox();
+            };
+            ws.onclose = function()
+            {
+            };
+        }
+    }
+}
+</script>
+
+<style>
+
+.lbl {
+    cursor: pointer;
+    position: relative;
+}
+
+.lbl::before {
+    position: absolute;
+    right: -60px;
+    top: 1px;
+    display: block;
+    height: 20px;
+    width: 45px;
+    background: #898989;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    content: '';
+}
+
+.lbl::after {
+    position: absolute;
+    right: -40px;
+    top: -2px;
+    display: block;
+    width: 26px;
+    height: 26px;
+    border-radius: 100%;
+    background-color: #ccc;
+    box-shadow: 0px 3px 3px rgba(0,0,0,0.05);
+    content: '';
+    transition: all 0.4s ease;
+}
+
+.lbl:active::after {
+    transform: scale(1.15, 0.85);
+}
+
+.cbox {
+    display: none;
+}
+
+.cbox:checked + .lbl:before {
+    background: #6fbeb5;
+}
+
+
+.cbox:checked + .lbl::after {
+    right: -62px;
+    background: #179588;
+}
+</style>
+</head>
+
+
+<body style="text-align: center;" onload="MakeDataSocket()">
+
+    <h1 style="margin-bottom: 2em;">DIP Switch States:</h1>
+
+    <p>
+        <input id="cbox1" type="checkbox" class="cbox" disabled />
+        <label for="cbox1" class="lbl">Switch 1: </label>
+    </p>
+    <p>
+        <input id="cbox2" type="checkbox" class="cbox" disabled />
+        <label for="cbox2" class="lbl">Switch 2: </label>
+    </p>
+    <p>
+        <input id="cbox3" type="checkbox" class="cbox" disabled />
+        <label for="cbox3" class="lbl">Switch 3: </label>
+    </p>
+    <p>
+        <input id="cbox4" type="checkbox" class="cbox" disabled />
+        <label for="cbox4" class="lbl">Switch 4: </label>
+    </p>
+    <p>
+        <input id="cbox5" type="checkbox" class="cbox" disabled />
+        <label for="cbox5" class="lbl">Switch 5: </label>
+    </p>
+    <p>
+        <input id="cbox6" type="checkbox" class="cbox" disabled />
+        <label for="cbox6" class="lbl">Switch 6: </label>
+    </p>
+    <p>
+        <input id="cbox7" type="checkbox" class="cbox" disabled />
+        <label for="cbox7" class="lbl">Switch 7: </label>
+    </p>
+    <p>
+        <input id="cbox8" type="checkbox" class="cbox" disabled />
+        <label for="cbox8" class="lbl">Switch 8: </label>
+    </p>
+
+</body>
+</html>
