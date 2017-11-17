@@ -80,8 +80,7 @@ void InputTask(void * pd)
     }
 }
 
-
-void SendConfigReport(int ws_fd)
+void SendSwitchesReport(int ws_fd)
 {
     SMPoolPtr pq;
     ParsedJsonDataSet JsonOutObject;
@@ -216,7 +215,7 @@ void UserMain(void * pd) {
     		if (ws_fd > 0)
     		{
     			DoSwitches();
-    			SendConfigReport(ws_fd);
+    			SendSwitchesReport(ws_fd);
     		}
     		else
     		{

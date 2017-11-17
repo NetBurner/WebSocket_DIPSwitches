@@ -10,74 +10,74 @@ var dip1, dip2, dip3, dip4, dip5, dip6, dip7, dip8;
 function updateCheckBox() {
     if( dip1 === "Off" )
     {
-        document.getElementById("cbox1").checked = false; 
+        document.getElementById("cbox1").checked = false;
     }
-    else if(dip1 === "On") 
+    else if(dip1 === "On")
     {
-        document.getElementById("cbox1").checked = true; 
+        document.getElementById("cbox1").checked = true;
     }
 
     if( dip2 === "Off" )
     {
-        document.getElementById("cbox2").checked = false; 
+        document.getElementById("cbox2").checked = false;
     }
-    else if(dip1 === "On") 
+    else if(dip1 === "On")
     {
-        document.getElementById("cbox2").checked = true; 
+        document.getElementById("cbox2").checked = true;
     }
 
     if( dip3 === "Off" )
     {
-        document.getElementById("cbox3").checked = false; 
+        document.getElementById("cbox3").checked = false;
     }
-    else if(dip3 === "On") 
+    else if(dip3 === "On")
     {
-        document.getElementById("cbox3").checked = true; 
+        document.getElementById("cbox3").checked = true;
     }
 
     if( dip4 === "Off" )
     {
-        document.getElementById("cbox4").checked = false; 
+        document.getElementById("cbox4").checked = false;
     }
-    else if(dip4 === "On") 
+    else if(dip4 === "On")
     {
-        document.getElementById("cbox4").checked = true; 
+        document.getElementById("cbox4").checked = true;
     }
 
     if( dip5 === "Off" )
     {
-        document.getElementById("cbox5").checked = false; 
+        document.getElementById("cbox5").checked = false;
     }
-    else if(dip5 === "On") 
+    else if(dip5 === "On")
     {
-        document.getElementById("cbox5").checked = true; 
+        document.getElementById("cbox5").checked = true;
     }
 
     if( dip6 === "Off" )
     {
-        document.getElementById("cbox6").checked = false; 
+        document.getElementById("cbox6").checked = false;
     }
-    else if(dip6 === "On") 
+    else if(dip6 === "On")
     {
-        document.getElementById("cbox6").checked = true; 
+        document.getElementById("cbox6").checked = true;
     }
 
     if( dip7 === "Off" )
     {
-        document.getElementById("cbox7").checked = false; 
+        document.getElementById("cbox7").checked = false;
     }
-    else if(dip7 === "On") 
+    else if(dip7 === "On")
     {
-        document.getElementById("cbox7").checked = true; 
+        document.getElementById("cbox7").checked = true;
     }
 
     if( dip8 === "Off" )
     {
-        document.getElementById("cbox8").checked = false; 
+        document.getElementById("cbox8").checked = false;
     }
-    else if(dip8 === "On") 
+    else if(dip8 === "On")
     {
-        document.getElementById("cbox8").checked = true; 
+        document.getElementById("cbox8").checked = true;
     }
 
 }
@@ -85,7 +85,7 @@ function updateCheckBox() {
 function MakeDataSocket() {
     if ("WebSocket" in window)
     {
-        if ((ws==null) || (ws.readyState==WebSocket.CLOSED)) 
+        if ((ws==null) || (ws.readyState==WebSocket.CLOSED))
         {
             ws = new WebSocket("ws://"+window.location.hostname+"/INDEX");
             ws.onopen = function()
@@ -94,7 +94,7 @@ function MakeDataSocket() {
             ws.onmessage = function(evt) {
                 var rxMsg = evt.data;
                 report = JSON.parse(rxMsg);
-                
+
                 dip1 = report.dipSwitches.dip1;
                 dip2 = report.dipSwitches.dip2;
                 dip3 = report.dipSwitches.dip3;
@@ -103,7 +103,7 @@ function MakeDataSocket() {
                 dip6 = report.dipSwitches.dip6;
                 dip7 = report.dipSwitches.dip7;
                 dip8 = report.dipSwitches.dip8;
-                    
+
                 updateCheckBox();
             };
             ws.onclose = function()
