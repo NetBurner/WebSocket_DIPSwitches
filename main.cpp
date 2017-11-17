@@ -100,6 +100,9 @@ void SendConfigReport(int ws_fd)
     JsonOutObject.EndObject();
     JsonOutObject.DoneBuilding();
 
+    // If you would like to print the JSON object to serial to see the format, uncomment the next line
+    //JsonOutObject.PrintObject(true);
+
     // Print JSON object to a buffer and write the buffer to the WebSocket file descriptor
     int dataLen = JsonOutObject.PrintObjectToBuffer(ReportBuffer, REPORT_BUF_SIZE);
     writeall(ws_fd, ReportBuffer, dataLen);
