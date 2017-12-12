@@ -6,86 +6,136 @@
 var ws;
 var report;
 var dip1, dip2, dip3, dip4, dip5, dip6, dip7, dip8;
+var led0, led1, led2, led3, led4, led5, led6, led7;
 
 function updateCheckBox() {
     if( dip1 === "Off" )
     {
-        document.getElementById("cbox1").checked = false;
+        document.getElementById("cbox1").checked = false; 
     }
-    else if(dip1 === "On")
+    else if(dip1 === "On") 
     {
-        document.getElementById("cbox1").checked = true;
+        document.getElementById("cbox1").checked = true; 
     }
 
     if( dip2 === "Off" )
     {
-        document.getElementById("cbox2").checked = false;
+        document.getElementById("cbox2").checked = false; 
     }
-    else if(dip1 === "On")
+    else if(dip1 === "On") 
     {
-        document.getElementById("cbox2").checked = true;
+        document.getElementById("cbox2").checked = true; 
     }
 
     if( dip3 === "Off" )
     {
-        document.getElementById("cbox3").checked = false;
+        document.getElementById("cbox3").checked = false; 
     }
-    else if(dip3 === "On")
+    else if(dip3 === "On") 
     {
-        document.getElementById("cbox3").checked = true;
+        document.getElementById("cbox3").checked = true; 
     }
 
     if( dip4 === "Off" )
     {
-        document.getElementById("cbox4").checked = false;
+        document.getElementById("cbox4").checked = false; 
     }
-    else if(dip4 === "On")
+    else if(dip4 === "On") 
     {
-        document.getElementById("cbox4").checked = true;
+        document.getElementById("cbox4").checked = true; 
     }
 
     if( dip5 === "Off" )
     {
-        document.getElementById("cbox5").checked = false;
+        document.getElementById("cbox5").checked = false; 
     }
-    else if(dip5 === "On")
+    else if(dip5 === "On") 
     {
-        document.getElementById("cbox5").checked = true;
+        document.getElementById("cbox5").checked = true; 
     }
 
     if( dip6 === "Off" )
     {
-        document.getElementById("cbox6").checked = false;
+        document.getElementById("cbox6").checked = false; 
     }
-    else if(dip6 === "On")
+    else if(dip6 === "On") 
     {
-        document.getElementById("cbox6").checked = true;
+        document.getElementById("cbox6").checked = true; 
     }
 
     if( dip7 === "Off" )
     {
-        document.getElementById("cbox7").checked = false;
+        document.getElementById("cbox7").checked = false; 
     }
-    else if(dip7 === "On")
+    else if(dip7 === "On") 
     {
-        document.getElementById("cbox7").checked = true;
+        document.getElementById("cbox7").checked = true; 
     }
 
     if( dip8 === "Off" )
     {
-        document.getElementById("cbox8").checked = false;
+        document.getElementById("cbox8").checked = false; 
     }
-    else if(dip8 === "On")
+    else if(dip8 === "On") 
     {
-        document.getElementById("cbox8").checked = true;
+        document.getElementById("cbox8").checked = true; 
     }
 
+}
+
+function SetLED(e) {
+
+    var text;
+
+    switch(e.id){
+      case "ledcb0":
+        led0 = document.getElementById("ledcb0").checked;
+        console.log(e.id + " : " + led0);
+         text = '{ "' + e.id + '" : "' + led0 + '" }';
+        break;
+      case "ledcb1":
+        led1 = document.getElementById("ledcb1").checked;
+        console.log(e.id + " : " + led1);
+        text = '{ "' + e.id + '" : "' + led1 + '" }';
+        break;
+      case "ledcb2":
+        led2 = document.getElementById("ledcb2").checked;
+        console.log(e.id + " : " + led2);
+        text = '{ "' + e.id + '" : "' + led2 + '" }';
+        break;
+      case "ledcb3":
+        led3 = document.getElementById("ledcb3").checked;
+        console.log(e.id + " : " + led3);
+        text = '{ "' + e.id + '" : "' + led3 + '" }';
+        break;
+      case "ledcb4":
+        led4 = document.getElementById("ledcb4").checked;
+        console.log(e.id + " : " + led4);
+        text = '{ "' + e.id + '" : "' + led4 + '" }';
+        break;
+      case "ledcb5":
+        led5 = document.getElementById("ledcb5").checked;
+        console.log(e.id + " : " + led5);
+        text = '{ "' + e.id + '" : "' + led5 + '" }';
+        break;
+      case "ledcb6":
+        led6 = document.getElementById("ledcb6").checked;
+        console.log(e.id + " : " + led6);
+        text = '{ "' + e.id + '" : "' + led6 + '" }';
+        break;
+      case "ledcb7":
+        led7 = document.getElementById("ledcb7").checked;
+        console.log(e.id + " : " + led7);
+        text = '{ "' + e.id + '" : "' + led7 + '" }';
+    }
+
+    ws.send(text);
 }
 
 function MakeDataSocket() {
     if ("WebSocket" in window)
     {
-        if ((ws==null) || (ws.readyState==WebSocket.CLOSED))
+        if ((ws==null) || (ws.readyState==WebSocket.CLOSED)) 
         {
             ws = new WebSocket("ws://"+window.location.hostname+"/INDEX");
             ws.onopen = function()
@@ -94,7 +144,7 @@ function MakeDataSocket() {
             ws.onmessage = function(evt) {
                 var rxMsg = evt.data;
                 report = JSON.parse(rxMsg);
-
+                
                 dip1 = report.dipSwitches.dip1;
                 dip2 = report.dipSwitches.dip2;
                 dip3 = report.dipSwitches.dip3;
@@ -103,7 +153,7 @@ function MakeDataSocket() {
                 dip6 = report.dipSwitches.dip6;
                 dip7 = report.dipSwitches.dip7;
                 dip8 = report.dipSwitches.dip8;
-
+                    
                 updateCheckBox();
             };
             ws.onclose = function()
@@ -143,6 +193,7 @@ function MakeDataSocket() {
     width: 26px;
     height: 26px;
     border-radius: 100%;
+    /* color of DIP switch toggles in off state */
     background-color: #ccc;
     box-shadow: 0px 3px 3px rgba(0,0,0,0.05);
     content: '';
@@ -166,46 +217,292 @@ function MakeDataSocket() {
     right: -62px;
     background: #179588;
 }
+
+#lights td {
+    background: lightsteelblue;
+    padding-bottom: 15px;
+}
+
+
+
+html,
+body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100%;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  font-family: sans-serif;
+}
+
+ul,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tg-list {
+  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.tg-list-item {
+  margin: 0 2em;
+}
+
+h2 {
+  color: #777;
+}
+
+h4 {
+  color: #000000;
+}
+
+.tgl {
+  display: none;
+}
+.tgl, .tgl:after, .tgl:before, .tgl *, .tgl *:after, .tgl *:before, .tgl + .tgl-btn {
+  box-sizing: border-box;
+}
+.tgl::-moz-selection, .tgl:after::-moz-selection, .tgl:before::-moz-selection, .tgl *::-moz-selection, .tgl *:after::-moz-selection, .tgl *:before::-moz-selection, .tgl + .tgl-btn::-moz-selection {
+  background: none;
+}
+.tgl::selection, .tgl:after::selection, .tgl:before::selection, .tgl *::selection, .tgl *:after::selection, .tgl *:before::selection, .tgl + .tgl-btn::selection {
+  background: none;
+}
+.tgl + .tgl-btn {
+  outline: 0;
+  display: block;
+  width: 4em;
+  height: 2em;
+  position: relative;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.tgl + .tgl-btn:after, .tgl + .tgl-btn:before {
+  position: relative;
+  display: block;
+  content: "";
+  width: 50%;
+  height: 100%;
+}
+.tgl + .tgl-btn:after {
+  left: 0;
+}
+.tgl + .tgl-btn:before {
+  display: none;
+}
+.tgl:checked + .tgl-btn:after {
+  left: 50%;
+}
+
+
+.tgl-skewed + .tgl-btn {
+  overflow: hidden;
+  -webkit-transform: skew(-10deg);
+          transform: skew(-10deg);
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  font-family: sans-serif;
+  background: #888;
+}
+.tgl-skewed + .tgl-btn:after, .tgl-skewed + .tgl-btn:before {
+  -webkit-transform: skew(10deg);
+          transform: skew(10deg);
+  display: inline-block;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  line-height: 2em;
+  font-weight: bold;
+  /* color of LED toggle text */
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+.tgl-skewed + .tgl-btn:after {
+  left: 100%;
+  content: attr(data-tg-on);
+}
+.tgl-skewed + .tgl-btn:before {
+  left: 0;
+  content: attr(data-tg-off);
+}
+.tgl-skewed + .tgl-btn:active {
+  /* color of LED toggle's background while off */
+  background: #888;
+}
+.tgl-skewed + .tgl-btn:active:before {
+  left: -10%;
+}
+.tgl-skewed:checked + .tgl-btn {
+  /* color of LED toggle's background while on */
+  background: #ff0000;
+}
+.tgl-skewed:checked + .tgl-btn:before {
+  left: -100%;
+}
+.tgl-skewed:checked + .tgl-btn:after {
+  left: 0;
+}
+.tgl-skewed:checked + .tgl-btn:active:after {
+  left: 10%;
+}
+
+.mylist {
+  right: -100px;
+  position: relative;
+  top: -39px;
+}
+
+.mycheck {
+  right: 150px;
+}
+
+.mylabel {
+  position: relative;
+  right: -100px;
+  top: -45px;
+}
+
 </style>
 </head>
 
 
 <body style="text-align: center;" onload="MakeDataSocket()">
 
-    <h1 style="margin-bottom: 2em;">DIP Switch States:</h1>
+    <h1 style="margin-bottom: 2em;">DIP Switch & LED States:</h1>
 
-    <p>
+      <p><b>Toggle the DIP switches on the MOD-DEV-70CR to toggle the CSS Switches on this page.</b></p>
+
+      <p><b>Click on the LED switches below to toggle the LEDs on the MOD-DEV-70CR.</b></p>
+
+    <div style="width: 300px;height: 55px">
         <input id="cbox1" type="checkbox" class="cbox" disabled />
-        <label for="cbox1" class="lbl">Switch 1: </label>
-    </p>
-    <p>
-        <input id="cbox2" type="checkbox" class="cbox" disabled />
-        <label for="cbox2" class="lbl">Switch 2: </label>
-    </p>
-    <p>
-        <input id="cbox3" type="checkbox" class="cbox" disabled />
-        <label for="cbox3" class="lbl">Switch 3: </label>
-    </p>
-    <p>
-        <input id="cbox4" type="checkbox" class="cbox" disabled />
-        <label for="cbox4" class="lbl">Switch 4: </label>
-    </p>
-    <p>
-        <input id="cbox5" type="checkbox" class="cbox" disabled />
-        <label for="cbox5" class="lbl">Switch 5: </label>
-    </p>
-    <p>
-        <input id="cbox6" type="checkbox" class="cbox" disabled />
-        <label for="cbox6" class="lbl">Switch 6: </label>
-    </p>
-    <p>
-        <input id="cbox7" type="checkbox" class="cbox" disabled />
-        <label for="cbox7" class="lbl">Switch 7: </label>
-    </p>
-    <p>
-        <input id="cbox8" type="checkbox" class="cbox" disabled />
-        <label for="cbox8" class="lbl">Switch 8: </label>
-    </p>
+        <label for="cbox1" class="lbl mycheck">DIP Switch 1: </label>
 
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 0:</h4>
+            <input class="tgl tgl-skewed" id="ledcb0" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb0"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox2" type="checkbox" class="cbox" disabled />
+        <label for="cbox2" class="lbl mycheck">DIP Switch 2: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 1:</h4>
+            <input class="tgl tgl-skewed" id="ledcb1" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb1"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox3" type="checkbox" class="cbox" disabled />
+        <label for="cbox3" class="lbl mycheck">DIP Switch 3: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 2:</h4>
+            <input class="tgl tgl-skewed" id="ledcb2" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb2"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox4" type="checkbox" class="cbox" disabled />
+        <label for="cbox4" class="lbl mycheck">DIP Switch 4: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 3:</h4>
+            <input class="tgl tgl-skewed" id="ledcb3" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb3"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox5" type="checkbox" class="cbox" disabled />
+        <label for="cbox5" class="lbl mycheck">DIP Switch 5: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 4:</h4>
+            <input class="tgl tgl-skewed" id="ledcb4" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb4"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox6" type="checkbox" class="cbox" disabled />
+        <label for="cbox6" class="lbl mycheck">DIP Switch 6: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 5:</h4>
+            <input class="tgl tgl-skewed" id="ledcb5" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb5"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox7" type="checkbox" class="cbox" disabled />
+        <label for="cbox7" class="lbl mycheck">DIP Switch 7: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 6:</h4>
+            <input class="tgl tgl-skewed" id="ledcb6" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb6"></label>
+          </li>
+        </ul>
+    </div>
+
+    <div style="width: 300px;height: 55px">
+        <input id="cbox8" type="checkbox" class="cbox" disabled />
+        <label for="cbox8" class="lbl mycheck">DIP Switch 8: </label>
+
+        <ul class="tg-list mylist">
+          <li class="tg-list-item">
+            <h4>LED 7:</h4>
+            <input class="tgl tgl-skewed" id="ledcb7" type="checkbox" onclick="SetLED(this);"/>
+            <label class="tgl-btn mylabel" data-tg-off="OFF" data-tg-on="ON" for="ledcb7"></label>
+          </li>
+        </ul>
+    </div>
+
+
+<!-- SOURCE https://codepen.io/mallendeo/pen/eLIiG -->
 </body>
 </html>

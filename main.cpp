@@ -26,68 +26,165 @@
 #include <websockets.h>
 #include <string.h>
 #include <webclient/json_lexer.h>
+#include <pins.h>
 #include "SimpleAD.h"
 
-extern "C"
-{
+extern "C" {
   void UserMain(void * pd);
 }
 
-const char * AppName = "Real-Time DIP Switch States via WebSocket";
+const char * AppName = "Real-Time DIP Switch State via WebSocket";
 
+#define INCOMING_BUF_SIZE   8192
 #define REPORT_BUF_SIZE     512
-#define NUM_SWITCHES      8
-#define DIP_STATE_BUF_SIZE    8
-
-char ReportBuffer[REPORT_BUF_SIZE];
+#define NUM_LEDS            8
+#define NUM_SWITCHES        8
+#define STATE_BUF_SIZE      8
 
 extern http_wshandler *TheWSHandler;
 int ws_fd = -1;
 OS_SEM SockReadySem;
-char dipStates[NUM_SWITCHES][DIP_STATE_BUF_SIZE];
+char ReportBuffer[REPORT_BUF_SIZE];
+char dipStates[NUM_SWITCHES][STATE_BUF_SIZE];
+char IncomingBuffer[INCOMING_BUF_SIZE];
 
+
+/*-------------------------------------------------------------------
+ * On the MOD-DEV-70, the LEDs are on J2 connector pins:
+ * 15, 16, 31, 23, 37, 19, 20, 24 (in that order)
+ * -----------------------------------------------------------------*/
+void WriteLeds( BYTE LedMask )
+{
+   static BOOL bLedGpioInit = FALSE;
+   const BYTE PinNumber[8] = { 15, 16, 31, 23, 37, 19, 20, 24 };
+   BYTE BitMask = 0x01;
+
+   if ( ! bLedGpioInit )
+   {
+      for ( int i = 0; i < 8; i++ )
+      {
+         J2[PinNumber[i]].function( PIN_GPIO );
+      }
+      bLedGpioInit = TRUE;
+   }
+
+
+   for ( int i = 0; i < 8; i++ )
+   {
+      if ( (LedMask & BitMask) == 0 )
+      {
+         J2[PinNumber[i]] = 1;  // LEDs tied to 3.3V, so 1 = off
+      }
+      else
+      {
+         J2[PinNumber[i]] = 0;
+      }
+
+      BitMask <<= 1;
+   }
+}
+
+static void ParseInput( char *buf )
+{
+    char ledNumber[16];
+    int ledNum;
+    char ledState[STATE_BUF_SIZE];
+    int32_t stepCount;
+    static BYTE ledMask = 0x00;
+
+    memset(ledState, 0 , STATE_BUF_SIZE);
+    sscanf( buf, "{ \"ledcb%d\" : \"%s\" }", &ledNum, &ledState );
+
+    if (strstr(ledState, "true") != 0) {
+        ledMask |= (0x01 << (ledNum));
+    }
+    else
+    {
+        ledMask &= ~(0x01 << (ledNum));
+    }
+
+    WriteLeds(ledMask);
+}
+
+static int ConsumeSocket( char c, bool &inStr, bool &strEscape )
+{
+    switch (c) {
+    case '\\':
+        if (!inStr) {
+            return 0; // no change to openCount
+        }
+        strEscape = !strEscape;
+        break;
+    case '"':
+        if (!strEscape) { inStr = !inStr; }
+        else            { strEscape = false; }
+        break;
+    case '{':
+      iprintf("");
+        if (!strEscape) { return 1; }
+        else            { strEscape = false; }
+        break;
+    case '}':
+        if (!strEscape) { return -1; }
+        else            { strEscape = false; }
+        break;
+    default:
+        if (strEscape)  { strEscape = false; }
+        break;
+    }
+
+    return 0;
+}
 
 void InputTask(void * pd)
 {
   SMPoolPtr pp;
   fd_set read_fds;
   fd_set error_fds;
+  int index = 0, openCount = 0;
+  bool inString = false, strEscape = false;
 
   FD_ZERO( &read_fds );
   FD_ZERO( &error_fds );
 
-  while (1)
-  {
-    if (ws_fd > 0)
-    {
+  while (1) {
+    if (ws_fd > 0) {
       FD_SET(ws_fd, &read_fds);
       FD_SET(ws_fd, &error_fds);
-      if (select(1, &read_fds, NULL, &error_fds, 0))
-      {
-        if (FD_ISSET(ws_fd, &error_fds))
-        {
+      if (select(1, &read_fds, NULL, &error_fds, 0)) {
+        if (FD_ISSET(ws_fd, &error_fds)) {
           iprintf("Closing WebSocket\r\n");
           close(ws_fd);
           ws_fd = -1;
           iprintf("WebSocket Closed\r\n");
         }
-        if (FD_ISSET(ws_fd, &read_fds))
-        {
-          read( ws_fd, (char *)pp->pData, ETHER_BUFFER_SIZE );
-          NB::WebSocket::ws_flush( ws_fd );
+        if (FD_ISSET(ws_fd, &read_fds)) {
+          while (dataavail(ws_fd) && (index < INCOMING_BUF_SIZE)) {
+            read(ws_fd, IncomingBuffer + index, 1);
+            openCount += ConsumeSocket( IncomingBuffer[index], inString, strEscape );
+            index++;
+            if (openCount == 0) {
+              break;
+            }
+          }
         }
-        FD_ZERO( &read_fds );
-        FD_ZERO( &error_fds );
+        if (openCount == 0) {
+            IncomingBuffer[index] = '\0';
+            iprintf("read: %s\r\n", IncomingBuffer);
+            OSTimeDly(4);
+            ParseInput(IncomingBuffer);
+            index = 0;
+        }
       }
     }
-    else
-    {
+    else {
       OSSemPend( &SockReadySem, 0 );
     }
   }
 }
 
-void SendSwitchesReport(int ws_fd)
+
+void SendConfigReport(int ws_fd)
 {
   SMPoolPtr pq;
   ParsedJsonDataSet JsonOutObject;
@@ -116,20 +213,16 @@ void SendSwitchesReport(int ws_fd)
 
 int MyDoWSUpgrade( HTTP_Request *req, int sock, PSTR url, PSTR rxb )
 {
-  if (httpstricmp(url, "INDEX"))
-  {
-    if (ws_fd < 0)
-    {
+  if (httpstricmp(url, "INDEX")) {
+    if (ws_fd < 0) {
       int rv = WSUpgrade( req, sock );
-      if (rv >= 0)
-      {
+      if (rv >= 0) {
         ws_fd = rv;
         NB::WebSocket::ws_setoption(ws_fd, WS_SO_TEXT);
         OSSemPost( &SockReadySem );
         return 2;
       }
-      else
-      {
+      else {
         return 0;
       }
     }
@@ -166,9 +259,7 @@ BYTE ReadSwitch()
   {
     // if greater than half the 16-bit range, consider it logic high
     if ( GetADResult(PinNumber[i]) > ( 0x7FFF / 2) )
-    {
       BitMask |= (BYTE)(0xFF & BitPos);
-    }
   }
 
   return BitMask;
@@ -188,7 +279,7 @@ void DoSwitches()
   BYTE sw = getdipsw();
 #endif
 
-  memset(dipStates, 0 , NUM_SWITCHES * DIP_STATE_BUF_SIZE);
+  memset(dipStates, 0 , NUM_SWITCHES * STATE_BUF_SIZE);
 
   // Write out each row of the table
   for ( int i = 0; i < NUM_SWITCHES ; i++ )
@@ -196,12 +287,12 @@ void DoSwitches()
     if ( sw & (0x01 <<  i) )
     {
       // Switch is off
-      strncpy(dipStates[i], "Off", DIP_STATE_BUF_SIZE);
+      strncpy(dipStates[i], "Off", STATE_BUF_SIZE);
     }
     else
     {
       // Switch is on
-      strncpy(dipStates[i], "On", DIP_STATE_BUF_SIZE);
+      strncpy(dipStates[i], "On", STATE_BUF_SIZE);
     }
   }
 }
@@ -228,7 +319,7 @@ void UserMain(void * pd) {
     if (ws_fd > 0)
     {
       DoSwitches();
-      SendSwitchesReport(ws_fd);
+      SendConfigReport(ws_fd);
     }
     else
     {
