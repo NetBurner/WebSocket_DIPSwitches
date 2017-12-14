@@ -53,10 +53,11 @@ char IncomingBuffer[INCOMING_BUF_SIZE];
  * On the MOD-DEV-70, the LEDs are on J2 connector pins:
  * 15, 16, 31, 23, 37, 19, 20, 24 (in that order)
  * -----------------------------------------------------------------*/
-void WriteLeds( BYTE LedMask )
+void WriteLeds( int ledNum, bool ledValue )
 {
    static BOOL bLedGpioInit = FALSE;
    const BYTE PinNumber[8] = { 15, 16, 31, 23, 37, 19, 20, 24 };
+   static BYTE ledMask = 0x00;       // LED mask stores the state of all 8 LEDs
    BYTE BitMask = 0x01;
 
    if ( ! bLedGpioInit )
@@ -68,10 +69,20 @@ void WriteLeds( BYTE LedMask )
       bLedGpioInit = TRUE;
    }
 
+   if (ledValue)
+   {
+       // LED on
+       ledMask |= (0x01 << (ledNum));
+   }
+   else
+   {
+       // LED off
+       ledMask &= ~(0x01 << (ledNum));
+   }
 
    for ( int i = 0; i < 8; i++ )
    {
-      if ( (LedMask & BitMask) == 0 )
+      if ( (ledMask & BitMask) == 0 )
       {
          J2[PinNumber[i]] = 1;  // LEDs tied to 3.3V, so 1 = off
       }
@@ -84,26 +95,27 @@ void WriteLeds( BYTE LedMask )
    }
 }
 
-static void ParseInput( char *buf )
+static void ParseInputForLedMask( char *buf, int & ledNum, bool & ledValue )
 {
-    char ledNumber[16];
-    int ledNum;
-    char ledState[STATE_BUF_SIZE];
-    int32_t stepCount;
-    static BYTE ledMask = 0x00;
+    ParsedJsonDataSet JsonInObject(buf);
+    const char * pJsonElementName;
+    int tempLedValue = 0;
 
-    memset(ledState, 0 , STATE_BUF_SIZE);
-    sscanf( buf, "{ \"ledcb%d\" : \"%s\" }", &ledNum, &ledState );
+    /* Print the buffer received to serial  */
+//    JsonInObject.PrintObject(true);
 
-    if (strstr(ledState, "true") != 0) {
-        ledMask |= (0x01 << (ledNum));
-    }
-    else
-    {
-        ledMask &= ~(0x01 << (ledNum));
-    }
+    /* navigate to the first element name */
+    JsonInObject.GetFirst();
+    JsonInObject.GetNextNameInCurrentObject();
 
-    WriteLeds(ledMask);
+    /* Get a pointer to the first element's name */
+    pJsonElementName = JsonInObject.CurrentName();
+
+    /* Scan the element name for the LED number. Store the number value */
+    sscanf( pJsonElementName, "ledcb%d\"", &ledNum );
+
+    /* Get the boolean value of the JSON element */
+    ledValue = JsonInObject.FindFullNamePermissiveBoolean(pJsonElementName);
 }
 
 static int ConsumeSocket( char c, bool &inStr, bool &strEscape )
@@ -169,10 +181,13 @@ void InputTask(void * pd)
           }
         }
         if (openCount == 0) {
+            int ledNum;
+            bool ledValue;
             IncomingBuffer[index] = '\0';
             iprintf("read: %s\r\n", IncomingBuffer);
             OSTimeDly(4);
-            ParseInput(IncomingBuffer);
+            ParseInputForLedMask(IncomingBuffer, ledNum, ledValue);
+            WriteLeds(ledNum, ledValue);
             index = 0;
         }
       }
@@ -318,7 +333,10 @@ void UserMain(void * pd) {
   {
     if (ws_fd > 0)
     {
+      // Get the state of the DIP switches
       DoSwitches();
+
+      // Send the state of the DIP switches as a JSON blob via a WebSocket
       SendConfigReport(ws_fd);
     }
     else

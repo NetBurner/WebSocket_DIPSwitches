@@ -11,131 +11,135 @@ var led0, led1, led2, led3, led4, led5, led6, led7;
 function updateCheckBox() {
     if( dip1 === "Off" )
     {
-        document.getElementById("cbox1").checked = false; 
+        document.getElementById("cbox1").checked = false;
     }
-    else if(dip1 === "On") 
+    else if(dip1 === "On")
     {
-        document.getElementById("cbox1").checked = true; 
+        document.getElementById("cbox1").checked = true;
     }
 
     if( dip2 === "Off" )
     {
-        document.getElementById("cbox2").checked = false; 
+        document.getElementById("cbox2").checked = false;
     }
-    else if(dip1 === "On") 
+    else if(dip1 === "On")
     {
-        document.getElementById("cbox2").checked = true; 
+        document.getElementById("cbox2").checked = true;
     }
 
     if( dip3 === "Off" )
     {
-        document.getElementById("cbox3").checked = false; 
+        document.getElementById("cbox3").checked = false;
     }
-    else if(dip3 === "On") 
+    else if(dip3 === "On")
     {
-        document.getElementById("cbox3").checked = true; 
+        document.getElementById("cbox3").checked = true;
     }
 
     if( dip4 === "Off" )
     {
-        document.getElementById("cbox4").checked = false; 
+        document.getElementById("cbox4").checked = false;
     }
-    else if(dip4 === "On") 
+    else if(dip4 === "On")
     {
-        document.getElementById("cbox4").checked = true; 
+        document.getElementById("cbox4").checked = true;
     }
 
     if( dip5 === "Off" )
     {
-        document.getElementById("cbox5").checked = false; 
+        document.getElementById("cbox5").checked = false;
     }
-    else if(dip5 === "On") 
+    else if(dip5 === "On")
     {
-        document.getElementById("cbox5").checked = true; 
+        document.getElementById("cbox5").checked = true;
     }
 
     if( dip6 === "Off" )
     {
-        document.getElementById("cbox6").checked = false; 
+        document.getElementById("cbox6").checked = false;
     }
-    else if(dip6 === "On") 
+    else if(dip6 === "On")
     {
-        document.getElementById("cbox6").checked = true; 
+        document.getElementById("cbox6").checked = true;
     }
 
     if( dip7 === "Off" )
     {
-        document.getElementById("cbox7").checked = false; 
+        document.getElementById("cbox7").checked = false;
     }
-    else if(dip7 === "On") 
+    else if(dip7 === "On")
     {
-        document.getElementById("cbox7").checked = true; 
+        document.getElementById("cbox7").checked = true;
     }
 
     if( dip8 === "Off" )
     {
-        document.getElementById("cbox8").checked = false; 
+        document.getElementById("cbox8").checked = false;
     }
-    else if(dip8 === "On") 
+    else if(dip8 === "On")
     {
-        document.getElementById("cbox8").checked = true; 
+        document.getElementById("cbox8").checked = true;
     }
 
 }
 
-function SetLED(e) {
+function SetLED(event) {
 
-    var text;
+    var ledJsonText;
 
-    switch(e.id){
+    switch(event.id){
       case "ledcb0":
         led0 = document.getElementById("ledcb0").checked;
-        console.log(e.id + " : " + led0);
-         text = '{ "' + e.id + '" : "' + led0 + '" }';
-        break;
+        console.log(event.id + " : " + led0);
+         ledJsonText = '{ "' + event.id + '" : "' + led0 + '" }';
+         break;
       case "ledcb1":
         led1 = document.getElementById("ledcb1").checked;
-        console.log(e.id + " : " + led1);
-        text = '{ "' + e.id + '" : "' + led1 + '" }';
+        console.log(event.id + " : " + led1);
+        ledJsonText = '{ "' + event.id + '" : "' + led1 + '" }';
         break;
       case "ledcb2":
         led2 = document.getElementById("ledcb2").checked;
-        console.log(e.id + " : " + led2);
-        text = '{ "' + e.id + '" : "' + led2 + '" }';
+        console.log(event.id + " : " + led2);
+        ledJsonText = '{ "' + event.id + '" : "' + led2 + '" }';
         break;
       case "ledcb3":
         led3 = document.getElementById("ledcb3").checked;
-        console.log(e.id + " : " + led3);
-        text = '{ "' + e.id + '" : "' + led3 + '" }';
+        console.log(event.id + " : " + led3);
+        ledJsonText = '{ "' + event.id + '" : "' + led3 + '" }';
         break;
       case "ledcb4":
         led4 = document.getElementById("ledcb4").checked;
-        console.log(e.id + " : " + led4);
-        text = '{ "' + e.id + '" : "' + led4 + '" }';
+        console.log(event.id + " : " + led4);
+        ledJsonText = '{ "' + event.id + '" : "' + led4 + '" }';
         break;
       case "ledcb5":
         led5 = document.getElementById("ledcb5").checked;
-        console.log(e.id + " : " + led5);
-        text = '{ "' + e.id + '" : "' + led5 + '" }';
+        console.log(event.id + " : " + led5);
+        ledJsonText = '{ "' + event.id + '" : "' + led5 + '" }';
         break;
       case "ledcb6":
         led6 = document.getElementById("ledcb6").checked;
-        console.log(e.id + " : " + led6);
-        text = '{ "' + e.id + '" : "' + led6 + '" }';
+        console.log(event.id + " : " + led6);
+        ledJsonText = '{ "' + event.id + '" : "' + led6 + '" }';
         break;
       case "ledcb7":
         led7 = document.getElementById("ledcb7").checked;
-        console.log(e.id + " : " + led7);
-        text = '{ "' + e.id + '" : "' + led7 + '" }';
+        console.log(event.id + " : " + led7);
+        ledJsonText = '{ "' + event.id + '" : "' + led7 + '" }';
     }
 
-    ws.send(text);
+    if ((ws!=null) && (ws.readyState==WebSocket.OPEN)) {
+        ws.send(ledJsonText);
+    }
+
+
 }
 
 function MakeDataSocket() {
     if ("WebSocket" in window)
     {
-        if ((ws==null) || (ws.readyState==WebSocket.CLOSED)) 
+        if ((ws==null) || (ws.readyState==WebSocket.CLOSED))
         {
             ws = new WebSocket("ws://"+window.location.hostname+"/INDEX");
             ws.onopen = function()
@@ -144,7 +148,7 @@ function MakeDataSocket() {
             ws.onmessage = function(evt) {
                 var rxMsg = evt.data;
                 report = JSON.parse(rxMsg);
-                
+
                 dip1 = report.dipSwitches.dip1;
                 dip2 = report.dipSwitches.dip2;
                 dip3 = report.dipSwitches.dip3;
@@ -153,7 +157,7 @@ function MakeDataSocket() {
                 dip6 = report.dipSwitches.dip6;
                 dip7 = report.dipSwitches.dip7;
                 dip8 = report.dipSwitches.dip8;
-                    
+
                 updateCheckBox();
             };
             ws.onclose = function()
@@ -392,11 +396,13 @@ h4 {
 
 <body style="text-align: center;" onload="MakeDataSocket()">
 
-    <h1 style="margin-bottom: 2em;">DIP Switch & LED States:</h1>
+    <h1 style="margin-bottom: 2em;">DIP Switch and LED States:</h1>
 
-      <p><b>Toggle the DIP switches on the MOD-DEV-70CR to toggle the CSS Switches on this page.</b></p>
+      <p><b>Toggle the DIP switches on the MOD-DEV-70CR to toggle the Switches on this page.</b></p>
 
       <p><b>Click on the LED switches below to toggle the LEDs on the MOD-DEV-70CR.</b></p>
+      <br/>
+      <br/>
 
     <div style="width: 300px;height: 55px">
         <input id="cbox1" type="checkbox" class="cbox" disabled />
