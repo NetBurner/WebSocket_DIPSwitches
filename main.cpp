@@ -57,18 +57,21 @@ void WriteLeds( int ledNum, bool ledValue )
 {
    static BOOL bLedGpioInit = FALSE;
    const BYTE PinNumber[8] = { 15, 16, 31, 23, 37, 19, 20, 24 };
-   static BYTE ledMask = 0x00;       // LED mask stores the state of all 8 LEDs
+   static BYTE ledMask = 0x00;       // Stores the state of all 8 LEDs
    BYTE BitMask = 0x01;
 
+   /* If this is the first call to this function, initialize the LED pins */
    if ( ! bLedGpioInit )
    {
       for ( int i = 0; i < 8; i++ )
       {
+         /* Initialize the LED pins to GPIO */
          J2[PinNumber[i]].function( PIN_GPIO );
       }
       bLedGpioInit = TRUE;
    }
 
+   // Write the LED state to the LED mask where bit0 represents LED0 and bit7 represents LED7
    if (ledValue)
    {
        // LED on
@@ -80,6 +83,7 @@ void WriteLeds( int ledNum, bool ledValue )
        ledMask &= ~(0x01 << (ledNum));
    }
 
+   // Write to all LEDs
    for ( int i = 0; i < 8; i++ )
    {
       if ( (ledMask & BitMask) == 0 )
@@ -90,19 +94,18 @@ void WriteLeds( int ledNum, bool ledValue )
       {
          J2[PinNumber[i]] = 0;
       }
-
       BitMask <<= 1;
    }
 }
 
-static void ParseInputForLedMask( char *buf, int & ledNum, bool & ledValue )
+static void ParseInputForLedMask( char *buf, int &ledNum, bool &ledValue )
 {
     ParsedJsonDataSet JsonInObject(buf);
     const char * pJsonElementName;
     int tempLedValue = 0;
 
     /* Print the buffer received to serial  */
-//    JsonInObject.PrintObject(true);
+    // JsonInObject.PrintObject(true);
 
     /* navigate to the first element name */
     JsonInObject.GetFirst();
@@ -171,6 +174,10 @@ void InputTask(void * pd)
           iprintf("WebSocket Closed\r\n");
         }
         if (FD_ISSET(ws_fd, &read_fds)) {
+          /*
+           * Read until a full JSON object is received. A full JSON object received
+           * is determined by receiving a '{' and a matching '}'
+           */
           while (dataavail(ws_fd) && (index < INCOMING_BUF_SIZE)) {
             read(ws_fd, IncomingBuffer + index, 1);
             openCount += ConsumeSocket( IncomingBuffer[index], inString, strEscape );
@@ -180,6 +187,7 @@ void InputTask(void * pd)
             }
           }
         }
+        /* Parse the JSON object for the LED number and state then toggle the LEDs */
         if (openCount == 0) {
             int ledNum;
             bool ledValue;
