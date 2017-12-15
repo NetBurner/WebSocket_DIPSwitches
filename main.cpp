@@ -184,7 +184,7 @@ void InputTask(void * pd)
             int ledNum;
             bool ledValue;
             IncomingBuffer[index] = '\0';
-            iprintf("read: %s\r\n", IncomingBuffer);
+            // iprintf("rx: %s\r\n", IncomingBuffer);
             OSTimeDly(4);
             ParseInputForLedMask(IncomingBuffer, ledNum, ledValue);
             WriteLeds(ledNum, ledValue);
